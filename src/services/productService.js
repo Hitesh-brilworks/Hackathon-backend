@@ -33,8 +33,18 @@ const updateProduct = async (id, productData) => {
   }
 };
 
+// Get all products
+const getAllProducts = async () => {
+  try {
+    return await Product.find();
+  } catch (error) {
+    throw createError("Error fetching products", 500, error);
+  }
+};
+
 module.exports = {
   createProduct,
   getProductById,
   updateProduct,
+  getAllProducts,
 };

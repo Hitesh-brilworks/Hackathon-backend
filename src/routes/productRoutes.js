@@ -1,7 +1,67 @@
-const express = require('express');
-const productController = require('../controllers/productController');
+const express = require("express");
+const productController = require("../controllers/productController");
+const { upload } = require("../utils/uploadUtils");
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Get all products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: List of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *                       category:
+ *                         type: string
+ *                       image:
+ *                         type: string
+ *                         description: Image URL
+ *                       inStock:
+ *                         type: boolean
+ */
+router.get("/", productController.getAllProducts);
+
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   get:
+ *     summary: Get product by ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product details
+ *       404:
+ *         description: Product not found
+ */
+router.get("/:id", productController.getProductById);
 
 /**
  * @swagger
@@ -12,7 +72,7 @@ const router = express.Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -31,13 +91,17 @@ const router = express.Router();
  *                 type: string
  *               inStock:
  *                 type: boolean
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Product image file
  *     responses:
  *       201:
  *         description: Product created successfully
  *       400:
  *         description: Validation error
  */
-router.post('/', productController.createProduct);
+router.post("/", upload.single("image"), productController.createProduct);
 
 /**
  * @swagger
@@ -54,7 +118,7 @@ router.post('/', productController.createProduct);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -73,6 +137,10 @@ router.post('/', productController.createProduct);
  *                 type: string
  *               inStock:
  *                 type: boolean
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Product image file
  *     responses:
  *       200:
  *         description: Product updated successfully
@@ -81,7 +149,7 @@ router.post('/', productController.createProduct);
  *       400:
  *         description: Validation error
  */
-router.put('/:id', productController.updateProduct);
+router.put("/:id", upload.single("image"), productController.updateProduct);
 
 /**
  * @swagger
@@ -98,7 +166,7 @@ router.put('/:id', productController.updateProduct);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -112,6 +180,10 @@ router.put('/:id', productController.updateProduct);
  *                 type: string
  *               inStock:
  *                 type: boolean
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Product image file
  *     responses:
  *       200:
  *         description: Product updated successfully
@@ -120,6 +192,6 @@ router.put('/:id', productController.updateProduct);
  *       400:
  *         description: Validation error
  */
-router.patch('/:id', productController.patchProduct);
+router.patch("/:id", upload.single("image"), productController.patchProduct);
 
 module.exports = router;

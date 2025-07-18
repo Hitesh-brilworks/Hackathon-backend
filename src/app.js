@@ -14,6 +14,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// Serve static files
+app.use("/uploads", express.static("uploads"));
+
 // Database connection
 db.connect();
 
