@@ -5,7 +5,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 const db = require("./config/database");
 const routes = require("./routes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-const Port = 2000;
+const Port = process.env.PORT || 2000;
 // Load environment variables
 dotenv.config();
 
