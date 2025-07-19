@@ -51,6 +51,15 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "API Documentation",
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT", // Optional: for display purposes only
+        },
+      },
+    },
     servers: [
       {
         url: `http://localhost:${Port}`,
