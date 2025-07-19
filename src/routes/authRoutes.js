@@ -114,6 +114,24 @@ const router = express.Router();
  *           type: string
  *           enum: ["Lose Weight", "Gain Muscle", "Improve Endurance", "Maintain Weight", "Increase Flexibility", "Build Strength", "General Fitness"]
  *           example: "Gain Muscle"
+ *         firstName:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 25
+ *           example: "John"
+ *         lastName:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 25
+ *           example: "Doe"
+ *         fitnessLevel:
+ *           type: string
+ *           enum: [Beginner, Intermediate, Advanced]
+ *           example: "Intermediate"
+ *         workoutFrequency:
+ *           type: string
+ *           enum: ["1-2 times per week", "3-4 times per week", "5-6 times per week", "Daily"]
+ *           example: "3-4 times per week"
  *     LoginRequest:
  *       type: object
  *       required:
@@ -261,6 +279,10 @@ const router = express.Router();
  *                   value: 60
  *                   unit: "kg"
  *                 fitnessGoal: "Lose Weight"
+ *                 firstName: "Jane"
+ *                 lastName: "Smith"
+ *                 fitnessLevel: "Beginner"
+ *                 workoutFrequency: "3-4 times per week"
  *             imperial_user:
  *               summary: User with imperial measurements
  *               value:
