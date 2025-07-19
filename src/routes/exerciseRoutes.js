@@ -62,11 +62,24 @@ const router = express.Router();
  * /api/exercises:
  *   get:
  *     summary: Get all exercises
- *     description: Retrieve all exercises from the database
+ *     description: Retrieve all exercises from the database with optional search and filtering
  *     tags: [Exercises]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search exercises by name (case-insensitive)
+ *         example: "lateral"
+ *       - in: query
+ *         name: primaryMuscles
+ *         schema:
+ *           type: string
+ *         description: Filter exercises by primary muscle group
+ *         example: "shoulders"
  *     responses:
  *       200:
- *         description: Successfully retrieved all exercises
+ *         description: Successfully retrieved exercises
  *         content:
  *           application/json:
  *             schema:
@@ -132,6 +145,36 @@ router.get("/", exerciseController.getAllExercises);
  *                   example: "Database connection failed"
  */
 router.get("/categories", exerciseController.getAllCategories);
+/**
+ * @swagger
+ * /api/exercises/primary-muscles:
+ *   get:
+ *     summary: Get all primary muscles
+ *     description: Retrieve all unique primary muscle groups from exercises
+ *     tags: [Exercises]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all primary muscles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 count:
+ *                   type: integer
+ *                   example: 12
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["biceps", "chest", "shoulders", "triceps"]
+ *       500:
+ *         description: Server error
+ */
+router.get("/primary-muscles", exerciseController.getAllPrimaryMuscles);
 // router.post("/", exerciseController.importExercises);
 
 module.exports = router;

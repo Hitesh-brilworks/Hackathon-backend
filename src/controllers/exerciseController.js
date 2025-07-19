@@ -15,7 +15,22 @@ const exercises = require("../config/exercises.json");
 
 const getAllExercises = async (req, res) => {
   try {
-    const exercises = await Exercise.find({}).sort({ name: 1 });
+    const { search, primaryMuscles } = req.query;
+
+    // Build query object
+    let query = {};
+
+    // Add search filter (case-insensitive search in name)
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    // Add primaryMuscles filter
+    if (primaryMuscles) {
+      query.primaryMuscles = { $in: [primaryMuscles] };
+    }
+
+    const exercises = await Exercise.find(query).sort({ name: 1 });
     res.status(200).json({
       success: true,
       count: exercises.length,
@@ -39,4 +54,17 @@ const getAllCategories = async (req, res) => {
   }
 };
 
-module.exports = { getAllExercises, getAllCategories };
+const getAllPrimaryMuscles = async (req, res) => {
+  try {
+    const primaryMuscles = await Exercise.distinct("primaryMuscles");
+    res.status(200).json({
+      success: true,
+      count: primaryMuscles.length,
+      data: primaryMuscles.sort(),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { getAllExercises, getAllCategories, getAllPrimaryMuscles };
