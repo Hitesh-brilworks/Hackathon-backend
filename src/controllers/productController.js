@@ -92,6 +92,7 @@ const updateProduct = async (req, res, next) => {
 const patchProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log("data");
 
     // Check if product exists
     const existingProduct = await productService.getProductById(id);
