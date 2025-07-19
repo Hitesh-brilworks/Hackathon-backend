@@ -71,6 +71,7 @@ const updateProduct = async (req, res, next) => {
     if (req.file) {
       validatedData.image = generateImageUrl(req, req.file.filename);
     }
+    console.log("data");
 
     // Update product
     const updatedProduct = await productService.updateProduct(
