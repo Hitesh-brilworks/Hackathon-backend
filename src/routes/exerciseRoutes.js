@@ -70,13 +70,13 @@ const router = express.Router();
  *         schema:
  *           type: string
  *         description: Search exercises by name (case-insensitive)
- *         example: "lateral"
+ *         example: ""
  *       - in: query
  *         name: primaryMuscles
  *         schema:
  *           type: string
  *         description: Filter exercises by primary muscle group
- *         example: "shoulders"
+ *         example: ""
  *     responses:
  *       200:
  *         description: Successfully retrieved exercises
