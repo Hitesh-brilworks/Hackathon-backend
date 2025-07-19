@@ -18,11 +18,17 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Password is required"],
     minlength: [6, "Password must be at least 6 characters long"],
   },
-  fullName: {
+  firstName: {
     type: String,
-    required: [true, "Full name is required"],
+    required: [true, "First name is required"],
     trim: true,
-    maxlength: [50, "Full name cannot exceed 50 characters"],
+    maxlength: [25, "First name cannot exceed 25 characters"],
+  },
+  lastName: {
+    type: String,
+    required: [true, "Last name is required"],
+    trim: true,
+    maxlength: [25, "Last name cannot exceed 25 characters"],
   },
   age: {
     type: Number,
@@ -103,6 +109,28 @@ const UserSchema = new mongoose.Schema({
         "General Fitness",
       ],
       message: "Please select a valid fitness goal",
+    },
+  },
+  fitnessLevel: {
+    type: String,
+    required: [true, "Fitness level is required"],
+    enum: {
+      values: ["Beginner", "Intermediate", "Advanced"],
+      message: "Fitness level must be one of: Beginner, Intermediate, Advanced",
+    },
+  },
+  workoutFrequency: {
+    type: String,
+    required: [true, "Workout frequency is required"],
+    enum: {
+      values: [
+        "1-2 times per week",
+        "3-4 times per week",
+        "5-6 times per week",
+        "Daily",
+      ],
+      message:
+        "Workout frequency must be one of: 1-2 times per week, 3-4 times per week, 5-6 times per week, Daily",
     },
   },
   isActive: {

@@ -7,10 +7,15 @@ const registerSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters long")
     .max(128, "Password cannot exceed 128 characters"),
-  fullName: z
+  firstName: z
     .string()
-    .min(2, "Full name must be at least 2 characters")
-    .max(50, "Full name cannot exceed 50 characters")
+    .min(2, "First name must be at least 2 characters")
+    .max(25, "First name cannot exceed 25 characters")
+    .trim(),
+  lastName: z
+    .string()
+    .min(2, "Last name must be at least 2 characters")
+    .max(25, "Last name cannot exceed 25 characters")
     .trim(),
   age: z.coerce
     .number()
@@ -84,6 +89,20 @@ const registerSchema = z.object({
     ],
     {
       errorMap: () => ({ message: "Please select a valid fitness goal" }),
+    }
+  ),
+  fitnessLevel: z.enum(["Beginner", "Intermediate", "Advanced"], {
+    errorMap: () => ({
+      message: "Fitness level must be one of: Beginner, Intermediate, Advanced",
+    }),
+  }),
+  workoutFrequency: z.enum(
+    ["1-2 times per week", "3-4 times per week", "5-6 times per week", "Daily"],
+    {
+      errorMap: () => ({
+        message:
+          "Workout frequency must be one of: 1-2 times per week, 3-4 times per week, 5-6 times per week, Daily",
+      }),
     }
   ),
 });
