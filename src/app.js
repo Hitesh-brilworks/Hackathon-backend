@@ -1,16 +1,38 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 const db = require("./config/database");
 const routes = require("./routes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-const Port = process.env.PORT || 2000;
+
 // Load environment variables
 dotenv.config();
 
+const Port = process.env.PORT || 2000;
+
 // Initialize express app
 const app = express();
+
+// CORS configuration - Allow all origins
+const corsOptions = {
+  origin: "*", // Allow all origins
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+  ],
+};
+
+app.use(cors(corsOptions));
+
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
