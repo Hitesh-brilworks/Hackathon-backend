@@ -94,6 +94,44 @@ const router = express.Router();
  *                   example: "Database connection failed"
  */
 router.get("/", exerciseController.getAllExercises);
+/**
+ * @swagger
+ * /api/exercises/categories:
+ *   get:
+ *     summary: Get all exercise categories
+ *     description: Retrieve all unique categories from exercises
+ *     tags: [Exercises]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 count:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["cardio", "olympic weightlifting", "plyometrics", "powerlifting", "strength", "stretching"]
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Database connection failed"
+ */
+router.get("/categories", exerciseController.getAllCategories);
 // router.post("/", exerciseController.importExercises);
 
 module.exports = router;

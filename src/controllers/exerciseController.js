@@ -15,7 +15,7 @@ const exercises = require("../config/exercises.json");
 
 const getAllExercises = async (req, res) => {
   try {
-    const exercises = await Exercise.find({});
+    const exercises = await Exercise.find({}).sort({ name: 1 });
     res.status(200).json({
       success: true,
       count: exercises.length,
@@ -26,4 +26,17 @@ const getAllExercises = async (req, res) => {
   }
 };
 
-module.exports = { getAllExercises };
+const getAllCategories = async (req, res) => {
+  try {
+    const categories = await Exercise.distinct("category");
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      data: categories.sort(),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { getAllExercises, getAllCategories };
