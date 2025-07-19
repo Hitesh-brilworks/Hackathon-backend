@@ -231,7 +231,7 @@ const getRoutinesByWeekday = async (req, res) => {
     const routinesWithCompletedFlag = routines.map((routine) => {
       const updatedExercises = routine.exercises.map((exercise) => {
         const isCompleted = completedExerciseMap.has(
-          `${routine._id}_${exercise.exerciseId._id}`
+          `${routine?._id}_${exercise?.exerciseId?._id}`
         );
         return {
           ...exercise.toObject(),
