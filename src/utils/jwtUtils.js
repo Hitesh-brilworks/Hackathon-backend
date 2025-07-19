@@ -3,9 +3,26 @@ const { createError } = require("./errorUtils");
 
 const generateToken = (payload) => {
   try {
-    return jwt.sign(payload, process.env.JWT_SECRET);
+    return jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "7d", // Default 7 days
+    });
   } catch (error) {
     throw createError("Error generating token", 500, error);
+  }
+};
+
+// Optional: Add refresh token generation
+const generateRefreshToken = (payload) => {
+  try {
+    return jwt.sign(
+      payload,
+      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d", // Default 30 days
+      }
+    );
+  } catch (error) {
+    throw createError("Error generating refresh token", 500, error);
   }
 };
 
@@ -25,5 +42,6 @@ const verifyToken = (token) => {
 
 module.exports = {
   generateToken,
+  generateRefreshToken,
   verifyToken,
 };
