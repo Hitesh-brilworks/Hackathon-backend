@@ -1,5 +1,6 @@
 const WorkoutRoutine = require("../models/workoutRoutineModel");
 const Exercise = require("../models/exerciseModel");
+const ActivityLog = require("../models/activityLogModel");
 
 // Create a new workout routine
 const createRoutine = async (req, res) => {
@@ -213,12 +214,47 @@ const getRoutinesByWeekday = async (req, res) => {
       "exercises.exerciseId",
       "name category equipment primaryMuscles"
     );
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    const activityLogs = await ActivityLog.find({
+      userId,
+      completedDate: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    const completedExerciseMap = new Map();
+    activityLogs.forEach((log) => {
+      completedExerciseMap.set(`${log.routineId}_${log.exerciseId}`, true);
+    });
+    const routinesWithCompletedFlag = routines.map((routine) => {
+      const updatedExercises = routine.exercises.map((exercise) => {
+        const isCompleted = completedExerciseMap.has(
+          `${routine._id}_${exercise.exerciseId._id}`
+        );
+        return {
+          ...exercise.toObject(),
+          completed: isCompleted,
+        };
+      });
+
+      return {
+        ...routine.toObject(),
+        exercises: updatedExercises,
+      };
+    });
 
     res.status(200).json({
       success: true,
       count: routines.length,
-      data: routines,
+      data: routinesWithCompletedFlag,
     });
+    // res.status(200).json({
+    //   success: true,
+    //   count: routines.length,
+    //   data: routines,
+    // });
   } catch (error) {
     res.status(500).json({
       success: false,
