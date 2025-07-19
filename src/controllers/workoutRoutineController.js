@@ -4,7 +4,8 @@ const Exercise = require("../models/exerciseModel");
 // Create a new workout routine
 const createRoutine = async (req, res) => {
   try {
-    const { title, weekdays, exercises } = req.body;
+    const { title, description, weekdays, exercises } = req.body;
+    console.log("req.user", req.user);
     const userId = req.user._id;
 
     // Validate exercises exist
@@ -12,7 +13,7 @@ const createRoutine = async (req, res) => {
     const existingExercises = await Exercise.find({
       _id: { $in: exerciseIds },
     });
-
+    console.log("existingExercises", existingExercises);
     if (existingExercises.length !== exerciseIds.length) {
       return res.status(400).json({
         success: false,
@@ -20,17 +21,12 @@ const createRoutine = async (req, res) => {
       });
     }
 
-    // Add order to exercises if not provided
-    const orderedExercises = exercises.map((exercise, index) => ({
-      ...exercise,
-      order: exercise.order !== undefined ? exercise.order : index,
-    }));
-
     const routine = new WorkoutRoutine({
       userId,
       title,
+      description,
       weekdays,
-      exercises: orderedExercises,
+      exercises,
     });
 
     await routine.save();
@@ -45,6 +41,7 @@ const createRoutine = async (req, res) => {
       data: routine,
     });
   } catch (error) {
+    console.log("data", data);
     res.status(500).json({
       success: false,
       message: error.message,

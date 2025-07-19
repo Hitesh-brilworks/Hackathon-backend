@@ -1,18 +1,5 @@
 const mongoose = require("mongoose");
 
-const setSchema = new mongoose.Schema({
-  kg: {
-    type: Number,
-    required: [true, "Weight is required"],
-    min: [0, "Weight cannot be negative"],
-  },
-  reps: {
-    type: Number,
-    required: [true, "Reps is required"],
-    min: [1, "Reps must be at least 1"],
-  },
-});
-
 const routineExerciseSchema = new mongoose.Schema({
   exerciseId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,19 +7,14 @@ const routineExerciseSchema = new mongoose.Schema({
     required: [true, "Exercise is required"],
   },
   sets: {
-    type: [setSchema],
-    required: [true, "At least one set is required"],
-    validate: {
-      validator: function (sets) {
-        return sets && sets.length > 0;
-      },
-      message: "At least one set is required",
-    },
-  },
-  order: {
     type: Number,
-    required: true,
-    min: 0,
+    required: [true, "Number of sets is required"],
+    min: [1, "Sets must be at least 1"],
+  },
+  reps: {
+    type: Number,
+    required: [true, "Number of reps is required"],
+    min: [1, "Reps must be at least 1"],
   },
 });
 
@@ -48,6 +30,11 @@ const workoutRoutineSchema = new mongoose.Schema(
       required: [true, "Routine title is required"],
       trim: true,
       maxlength: [50, "Title cannot exceed 50 characters"],
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [200, "Description cannot exceed 200 characters"],
     },
     weekdays: {
       type: [String],

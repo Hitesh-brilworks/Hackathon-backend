@@ -1,10 +1,11 @@
 const express = require("express");
 const workoutRoutineController = require("../controllers/workoutRoutineController");
-const { protect } = require("../middleware/authMiddleware");
+const { authenticateToken } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // Apply authentication to all routes
+router.use(authenticateToken);
 
 /**
  * @swagger
@@ -29,19 +30,19 @@ const router = express.Router();
  *       required:
  *         - exerciseId
  *         - sets
+ *         - reps
  *       properties:
  *         exerciseId:
  *           type: string
  *           example: "507f1f77bcf86cd799439011"
  *         sets:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Set'
- *           minItems: 1
- *         order:
  *           type: number
- *           minimum: 0
- *           example: 0
+ *           minimum: 1
+ *           example: 3
+ *         reps:
+ *           type: number
+ *           minimum: 1
+ *           example: 10
  *     WorkoutRoutine:
  *       type: object
  *       required:
@@ -56,6 +57,10 @@ const router = express.Router();
  *           type: string
  *           maxLength: 50
  *           example: "Push Day"
+ *         description:
+ *           type: string
+ *           maxLength: 200
+ *           example: "Upper body workout focusing on pushing movements"
  *         weekdays:
  *           type: array
  *           items:
@@ -101,6 +106,9 @@ const router = express.Router();
  *               title:
  *                 type: string
  *                 example: "Push Day"
+ *               description:
+ *                 type: string
+ *                 example: "Upper body workout focusing on pushing movements"
  *               weekdays:
  *                 type: array
  *                 items:
@@ -112,15 +120,15 @@ const router = express.Router();
  *                   $ref: '#/components/schemas/RoutineExercise'
  *           example:
  *             title: "Push Day"
+ *             description: "Upper body workout focusing on pushing movements"
  *             weekdays: ["Monday", "Wednesday"]
  *             exercises:
  *               - exerciseId: "507f1f77bcf86cd799439011"
- *                 sets:
- *                   - kg: 45
- *                     reps: 10
- *                   - kg: 45
- *                     reps: 8
- *                 order: 0
+ *                 sets: 3
+ *                 reps: 10
+ *               - exerciseId: "507f1f77bcf86cd799439012"
+ *                 sets: 4
+ *                 reps: 8
  *     responses:
  *       201:
  *         description: Routine created successfully
