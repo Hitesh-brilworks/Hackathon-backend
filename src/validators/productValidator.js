@@ -5,9 +5,9 @@ const { createValidationError } = require("../utils/errorUtils");
 const productSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  price: z.number().positive("Price must be a positive number"),
+  price: z.coerce.number().positive("Price must be a positive number"),
   category: z.string().min(2, "Category must be at least 2 characters"),
-  inStock: z.boolean().optional().default(true),
+  inStock: z.coerce.boolean().optional().default(true),
 });
 
 // Validate product data
