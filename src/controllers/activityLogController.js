@@ -4,11 +4,15 @@ const WorkoutRoutine = require("../models/workoutRoutineModel");
 // Complete a routine and log activity
 const completeRoutine = async (req, res) => {
   try {
-    const { routineId, exercises, workoutTime, notes } = req.body;
+    const { routineId, exerciseId } = req.body;
     const userId = req.user._id;
 
     // Get the original routine
-    const routine = await WorkoutRoutine.findOne({ _id: routineId, userId });
+    const routine = await WorkoutRoutine.findOne({
+      _id: routineId,
+      userId,
+      "exercises.exerciseId": exerciseId,
+    });
 
     if (!routine) {
       return res.status(404).json({
@@ -23,15 +27,9 @@ const completeRoutine = async (req, res) => {
       routineId,
       routineTitle: routine.title,
       routineDescription: routine.description,
-      scheduledDate: new Date().toDateString(),
+      completedDate: new Date().toDateString(),
       weekday: new Date().toLocaleDateString("en-US", { weekday: "long" }),
-      exercises: exercises.map((exercise) => ({
-        exerciseId: exercise.exerciseId,
-        name: exercise.name,
-        sets: exercise.sets,
-      })),
-      totalWorkoutTime: workoutTime || 0,
-      notes,
+      exerciseId,
     });
 
     await activityLog.save();
@@ -49,82 +47,82 @@ const completeRoutine = async (req, res) => {
   }
 };
 
-// Get weekly exercise totals
 const getWeeklyExerciseTotals = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { startDate, endDate, exerciseName } = req.query;
+    const today = new Date();
 
-    const start = startDate
-      ? new Date(startDate)
-      : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const end = endDate ? new Date(endDate) : new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+    startOfWeek.setHours(0, 0, 0, 0);
 
-    let matchQuery = {
-      userId,
-      completedDate: { $gte: start, $lte: end },
-      status: "completed",
-    };
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
 
-    if (exerciseName) {
-      matchQuery["exercises.name"] = { $regex: exerciseName, $options: "i" };
+    const weekDays = [];
+
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      day.setHours(0, 0, 0, 0);
+      weekDays.push(new Date(day));
     }
 
-    const pipeline = [
-      { $match: matchQuery },
-      { $unwind: "$exercises" },
-      {
-        $group: {
-          _id: {
-            exerciseId: "$exercises.exerciseId",
-            exerciseName: "$exercises.name",
-          },
-          totalSets: { $sum: "$exercises.totalSets" },
-          totalReps: { $sum: "$exercises.totalReps" },
-          totalVolume: { $sum: "$exercises.totalVolume" },
-          workoutCount: { $sum: 1 },
-          averageSetsPerWorkout: { $avg: "$exercises.totalSets" },
-          averageRepsPerWorkout: { $avg: "$exercises.totalReps" },
-          averageVolumePerWorkout: { $avg: "$exercises.totalVolume" },
-          maxWeight: { $max: { $max: "$exercises.sets.kg" } },
-          sessions: {
-            $push: {
-              date: "$completedDate",
-              sets: "$exercises.sets",
-              totalSets: "$exercises.totalSets",
-              totalReps: "$exercises.totalReps",
-              totalVolume: "$exercises.totalVolume",
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          exerciseId: "$_id.exerciseId",
-          exerciseName: "$_id.exerciseName",
-          totalSets: 1,
-          totalReps: 1,
-          totalVolume: 1,
-          workoutCount: 1,
-          averageSetsPerWorkout: { $round: ["$averageSetsPerWorkout", 1] },
-          averageRepsPerWorkout: { $round: ["$averageRepsPerWorkout", 1] },
-          averageVolumePerWorkout: { $round: ["$averageVolumePerWorkout", 1] },
-          maxWeight: 1,
-          sessions: 1,
-        },
-      },
-      { $sort: { totalVolume: -1 } },
-    ];
+    const progressData = [];
 
-    const exerciseTotals = await ActivityLog.aggregate(pipeline);
+    for (const day of weekDays) {
+      const nextDay = new Date(day);
+      nextDay.setDate(day.getDate() + 1);
 
-    res.status(200).json({
+      // Get all activity logs for the user on that day
+      const logs = await ActivityLog.find({
+        userId,
+        completedDate: {
+          $gte: day,
+          $lt: nextDay,
+        },
+      });
+
+      let completedExercises = logs.length;
+      let totalExercises = 0;
+      let routineTitle = "";
+
+      if (logs.length > 0) {
+        const routine = await WorkoutRoutine.findOne({
+          _id: logs[0].routineId,
+          userId,
+        });
+
+        if (routine) {
+          totalExercises = routine.exercises.length;
+          routineTitle = routine.title;
+        }
+      }
+
+      const completionPercentage =
+        totalExercises > 0
+          ? ((completedExercises / totalExercises) * 100).toFixed(2)
+          : 0;
+
+      progressData.push({
+        date: day.toISOString().split("T")[0],
+        day: day.toLocaleDateString("en-US", { weekday: "long" }),
+        routineTitle,
+        completedExercises,
+        totalExercises,
+        completionPercentage: Number(completionPercentage),
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      period: { start, end },
-      data: exerciseTotals,
+      weekStart: startOfWeek.toISOString().split("T")[0],
+      weekEnd: endOfWeek.toISOString().split("T")[0],
+      data: progressData,
     });
   } catch (error) {
+    console.error("Weekly progress error:", error);
     res.status(500).json({
       success: false,
       message: error.message,

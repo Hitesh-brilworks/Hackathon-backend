@@ -28,39 +28,9 @@ router.use(authenticateToken);
  *               routineId:
  *                 type: string
  *                 example: "507f1f77bcf86cd799439011"
- *               exercises:
- *                 type: array
- *                 items:
- *                   type: object
- *                   required:
- *                     - exerciseId
- *                     - name
- *                     - sets
- *                   properties:
- *                     exerciseId:
- *                       type: string
- *                       example: "507f1f77bcf86cd799439012"
- *                     name:
- *                       type: string
- *                       example: "Bench Press (Barbell)"
- *                     sets:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           kg:
- *                             type: number
- *                             example: 45
- *                           reps:
- *                             type: number
- *                             example: 10
- *               workoutTime:
- *                 type: number
- *                 description: Total workout time in minutes
- *                 example: 45
- *               notes:
+ *               exerciseId:
  *                 type: string
- *                 example: "Great workout today!"
+ *                 example: "507f1f77bcf86cd799439011"
  *     responses:
  *       201:
  *         description: Routine completed and logged successfully
